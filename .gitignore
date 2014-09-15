@@ -1,4 +1,5 @@
 *.pydevproject
+__pycache__/
 .project
 .metadata
 bin/**
