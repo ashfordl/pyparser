@@ -3,31 +3,34 @@ operators = ["^", "*", "/", "+", "-"]
 def convertToList(expression):
     exp = []
     
-    i = -1
     currentType = ""
     currentTerm = ""
-    while i+1 < len(expression):
-        i += 1
+    for i in range(len(expression)):
         char = expression[i]
         
-        if char.isdigit() and currentType in ["", "integer", "float"]:
+        if char.isdigit() and currentType in ["", "integer", "float"]: # If the character is a digit
             currentTerm += char
             currentType = currentType if currentType != "" else "integer"
             
-        elif char == "." and currentType == "integer":
-            currentType = "float"
-            currentTerm += char
+        elif char == "." and currentType in ["", "integer"]: # If the character is a decimal point
             try:
-                if not expression[i+1].isdigit():
-                    raise Exception("Decimal point at index %s is not followed by decimal.", i)
+                if expression[i+1].isdigit():
+                    currentType = "float"
+                    
+                    if currentType == "":
+                        currentTerm += "0"
+                    currentTerm += "."
             except IndexError: # In case x+1 exceeds the string length
-                raise Exception("Decimal point at index %s is not followed by decimal.", i)
-            
-        elif char in operators:
+                pass
+
+        elif char in operators: # If the character is an operator
             exp.append(currentTerm)
             currentTerm = ""
             currentType = ""
             exp.append(char) 
+            
+        else: # The character isn't recognised
+            raise Exception("Alien character present at index " + str(i))
                  
     exp.append(currentTerm)
     
