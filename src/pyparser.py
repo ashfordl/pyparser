@@ -16,7 +16,9 @@ def convertToList(expression):
     
     currentType = ""
     currentTerm = ""
-    for i in range(len(expression)):
+    
+    i = 0
+    while i < len(expression):
         char = expression[i]
         
         if char.isdigit() and currentType in ["", "integer", "float"]: # If the character is a digit
@@ -34,15 +36,37 @@ def convertToList(expression):
                 pass
 
         elif char in operators: # If the character is an operator
-            exp.append(currentTerm)
+            if currentTerm != "":
+                exp.append(currentTerm)
             currentTerm = ""
             currentType = ""
             exp.append(char) 
             
+        elif char == "(": # If the character is a bracket           
+            if currentType in ["integer", "float"]:
+                exp.append(currentTerm)
+            
+            close = findClosingBracket(expression, i)
+            substring = expression[i+1 : close]
+            
+            exp.append(convertToList(substring))
+            
+            currentType = ""
+            currentTerm = ""
+            
+            expression = expression[0:i] + expression[close + 1:]
+            
+            # Don't increment the iterator, we need to evaluate the next character
+            continue
+            
         else: # The character isn't recognised
             raise Exception("Alien character present at index " + str(i))
-                 
-    exp.append(currentTerm)
+        
+        # Increment the iterator
+        i += 1        
+    # Add the last term found
+    if currentTerm != "":
+        exp.append(currentTerm)
     
     return exp
             
