@@ -1,4 +1,4 @@
-import pyparser
+from pyparser import pyparser
 
 def main():
     expression = input("Enter expression: ")

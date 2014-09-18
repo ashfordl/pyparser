@@ -1,5 +1,5 @@
 import unittest
-import pyparser
+from pyparser import pyparser
 
 class ParserTest(unittest.TestCase):
 
