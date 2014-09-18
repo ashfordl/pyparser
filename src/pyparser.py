@@ -1,74 +1,77 @@
-operators = ["^", "*", "/", "+", "-"]
+OPERATORS = ["^", "*", "/", "+", "-"]
 
-def findClosingBracket(string, openingIndex):
+def find_closing_bracket(string, opening_index):
     level = 1
-    for x in range(openingIndex+1, len(string)):
-        if string[x] == '(':
+    for index in range(opening_index+1, len(string)):
+        if string[index] == '(':
             level += 1
-        elif string[x] == ")":
+        elif string[index] == ")":
             level -= 1
-        
-        if level == 0:
-            return x
+            if level == 0:
+                return index
 
-def convertToList(expression):
+def convert_to_list(expression):
     exp = []
-    
-    currentType = ""
-    currentTerm = ""
-    
+
+    current_type = ""
+    current_term = ""
+
     i = 0
     while i < len(expression):
         char = expression[i]
-        
-        if char.isdigit() and currentType in ["", "integer", "float"]: # If the character is a digit
-            currentTerm += char
-            currentType = currentType if currentType != "" else "integer"
-            
-        elif char == "." and currentType in ["", "integer"]: # If the character is a decimal point
+
+        # If the character is a digit
+        if char.isdigit() and current_type in ["", "integer", "float"]:
+            current_term += char
+            current_type = current_type if current_type != "" else "integer"
+
+        # If the character is a decimal point
+        elif char == "." and current_type in ["", "integer"]:
             try:
                 if expression[i+1].isdigit():
-                    if currentType == "":
-                        currentTerm += "0"
-                    currentTerm += "."
-                    currentType = "float"
+                    if current_type == "":
+                        current_term += "0"
+                    current_term += "."
+                    current_type = "float"
             except IndexError: # In case x+1 exceeds the string length
                 pass
 
-        elif char in operators: # If the character is an operator
-            if currentTerm != "":
-                exp.append(currentTerm)
-            currentTerm = ""
-            currentType = ""
-            exp.append(char) 
-            
-        elif char == "(": # If the character is a bracket           
-            if currentType in ["integer", "float"]:
-                exp.append(currentTerm)
-            
-            close = findClosingBracket(expression, i)
+        elif char in OPERATORS: # If the character is an operator
+            if current_term != "":
+                exp.append(current_term)
+            current_term = ""
+            current_type = ""
+            exp.append(char)
+
+        # If the character is a bracket
+        elif char == "(":
+            if current_type in ["integer", "float"]:
+                exp.append(current_term)
+
+            close = find_closing_bracket(expression, i)
             substring = expression[i+1 : close]
-            
-            exp.append(convertToList(substring))
-            
-            currentType = ""
-            currentTerm = ""
-            
+
+            exp.append(convert_to_list(substring))
+
+            current_type = ""
+            current_term = ""
+
             expression = expression[0:i] + expression[close + 1:]
-            
-            # Don't increment the iterator, we need to evaluate the next character
+
+            # Don't increment the iterator, as brackets were replaced
             continue
-            
-        else: # The character isn't recognised
+
+        # The character isn't recognised
+        else:
             raise Exception("Alien character present at index " + str(i))
-        
+
         # Increment the iterator
-        i += 1        
+        i += 1
     # Add the last term found
-    if currentTerm != "":
-        exp.append(currentTerm)
-    
+    if current_term != "":
+        exp.append(current_term)
+
     return exp
-            
+
 def parse(expression):
-    print(convertToList(expression))
+    print(convert_to_list(expression))
