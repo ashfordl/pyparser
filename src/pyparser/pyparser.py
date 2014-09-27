@@ -2,6 +2,8 @@
 Parses mathematical expressions
 '''
 
+from decimal import Decimal, InvalidOperation
+
 OPERATORS = ["^", "*", "/", "+", "-"]
 
 def find_closing_bracket(string, opening_index):
@@ -116,9 +118,81 @@ def convert_to_list(expression):
 
     return exp
 
+def operate(operator, arg1, arg2):
+    '''
+    Performs a calculation, given a mathematical sign and the two required arguments
+    '''
+
+    if operator == '+':
+        return arg1 + arg2
+    elif operator == '-':
+        return arg1 - arg2
+    elif operator == '*':
+        return arg1 * arg2
+    elif operator == '/':
+        return arg1 / arg2
+    elif operator == '^':
+        return arg1 ** arg2
+
+def parse_list_expression(exp):
+    '''
+    Parses a list of terms, and returns a numerical value for them
+    '''
+
+    # Convert each element to either a number or an operator
+    # if the element is a list, recursively parse that
+    for i in range(len(exp)):
+        # Assume element is a number
+        try:
+            exp[i] = Decimal(exp[i])
+        # If the element is not a number
+        except (ValueError, InvalidOperation):
+            # Is it a nested list (ie bracketed expression)?
+            if isinstance(exp[i], list):
+                exp[i] = parse_list_expression(exp[i])
+            # It is an operator; do nothing.
+            else:
+                pass
+
+    # Variables needed across iterations of the loop
+    arg1 = None
+    operator = None
+    i = 0
+    
+    # While loop needed as the condition needs to be evaluated each iteration
+    # This is because the expression is modified within the loop
+    while i < len(exp):
+        # Detect numbers
+        if isinstance(exp[i], Decimal):
+            # If we haven't got a left-hand operand
+            if arg1 == None:
+                arg1 = exp[i]
+            # If we do
+            else:
+                # Perform the calculation
+                value = operate(operator, arg1, exp[i])
+                # Recreate the list, with old terms replaced by the value
+                exp = exp[0:i - 2] + [value] + exp[i+1:]
+
+                # Reset variables
+                arg1 = None
+                i -= 3
+
+        # Detect and remember operators
+        elif exp[i] in OPERATORS:
+            operator = exp[i]
+
+        # Increment the iterator
+        i += 1
+
+    return exp[0]
+
 def parse(expression):
     '''
     Parses the given expression and prints the result
     '''
 
-    print(convert_to_list(expression))
+    exp = convert_to_list(expression)
+    print(exp)
+
+    print(parse_list_expression(exp))
