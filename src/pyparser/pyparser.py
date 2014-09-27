@@ -71,6 +71,8 @@ def convert_to_list(expression):
     exp = []
     current_term = ""
 
+    # While loop needed as the condition needs to be evaluated each iteration
+    # This is because the expression is modified within the loop
     i = 0
     while i < len(expression):
         char = expression[i]
@@ -80,8 +82,12 @@ def convert_to_list(expression):
             current_term += char
 
         # If the character is a decimal point
-        elif char == "." and "." not in current_term:
+        elif char == '.' and '.' not in current_term:
             current_term = char_decimal_point(expression, i, current_term)
+
+        # If the character is a minus sign, and the current term is not a number
+        elif char == '-' and current_term == '':
+            current_term += '-'
 
         # If the character is an operator
         elif char in OPERATORS:
@@ -91,9 +97,9 @@ def convert_to_list(expression):
             exp.append(char)
 
         # If the character is a bracket
-        elif char == "(":
+        elif char == '(':
             expression = char_open_bracket(expression, i, current_term, exp)
-            current_term = ""
+            current_term = ''
 
             # Don't increment the iterator, as brackets were replaced
             continue
