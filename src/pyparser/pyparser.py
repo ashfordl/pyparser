@@ -1,6 +1,14 @@
+'''
+Parses mathematical expressions
+'''
+
 OPERATORS = ["^", "*", "/", "+", "-"]
 
 def find_closing_bracket(string, opening_index):
+    '''
+    Finds and returns the closing index of a bracket
+    '''
+
     level = 1
     for index in range(opening_index+1, len(string)):
         if string[index] == '(':
@@ -11,13 +19,21 @@ def find_closing_bracket(string, opening_index):
                 return index
 
     # If loop finishes before bracket is found, raise an exception
-    
+    raise ValueError("No closing bracket for index " + opening_index)
 
 def add_term(exp, term):
+    '''
+    Adds the given term to the given expression
+    '''
+
     if term != '':
         exp.append(term)
 
 def char_decimal_point(expression, i, term):
+    '''
+    Parses a '.' when converting an expression to a list
+    '''
+
     try:
         if expression[i+1].isdigit():
             if term == '':
@@ -29,6 +45,10 @@ def char_decimal_point(expression, i, term):
     return term
 
 def char_open_bracket(expression, i, term, exp):
+    '''
+    Parses a '(' when converting an expression to a list
+    '''
+
     add_term(exp, term)
 
     # Find the index of the corresponding closing bracket
@@ -44,6 +64,10 @@ def char_open_bracket(expression, i, term, exp):
     return expression[0:i] + expression[close + 1:]
 
 def convert_to_list(expression):
+    '''
+    Converts the given expression to a collection of terms
+    '''
+
     exp = []
     current_term = ""
 
@@ -76,7 +100,7 @@ def convert_to_list(expression):
 
         # The character isn't recognised
         else:
-            raise Exception("Alien character present at index " + str(i))
+            raise ValueError("Alien character present at index " + str(i))
 
         # Increment the iterator
         i += 1
@@ -87,4 +111,8 @@ def convert_to_list(expression):
     return exp
 
 def parse(expression):
+    '''
+    Parses the given expression and prints the result
+    '''
+
     print(convert_to_list(expression))
